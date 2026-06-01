@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /emergency_groups/{groupId}/alerts/{alertId} {
+      allow read: if true;
+      allow create: if hasRequiredAlertFields(groupId);
+      allow update, delete: if false;
+    }
+  }
+}
+
+function hasRequiredAlertFields(groupId) {
+  return request.resource.data.patientName is string
+  && request.resource.data.patientName.size() > 0
+  && request.resource.data.patientName.size() <= 80
+  && request.resource.data.pairingCode is string
+  && request.resource.data.pairingCode == groupId
+  && request.resource.data.hasLocation is bool
+  && request.resource.data.createdAtMillis is number
+  && request.resource.data.mapsUrl is string
+  && request.resource.data.locationError is string;
+}
