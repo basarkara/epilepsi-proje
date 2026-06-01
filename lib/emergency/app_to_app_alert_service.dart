@@ -16,6 +16,7 @@ class AppToAppAlertService {
 
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _listener;
   static bool _firebaseReady = false;
+  static final Set<String> _seenAlertIds = <String>{};
 
   static Future<bool> initializeFirebase() async {
     if (_firebaseReady) {
@@ -40,7 +41,7 @@ class AppToAppAlertService {
 
   static Future<bool> requestPermissions() async {
     await EmergencyNotificationService.requestPermission();
-    return _requestLocationPermission();
+    return true;
   }
 
   static Future<void> sendEmergencyAlert() async {
@@ -76,6 +77,49 @@ class AppToAppAlertService {
         });
   }
 
+  static Future<void> sendDebugEmergencyAlert({
+    String? patientName,
+    bool includeSampleLocation = true,
+  }) async {
+    if (!kDebugMode) {
+      throw StateError('Test bildirimi sadece debug modda kullanılabilir.');
+    }
+
+    final settings = await EmergencyAppSettingsStore.load();
+    if (!settings.isReady) {
+      throw StateError('Eşleşme kodu ve isim ayarlanmamış.');
+    }
+    if (!await initializeFirebase()) {
+      throw StateError('Firebase bağlantısı yapılandırılmamış.');
+    }
+
+    final now = DateTime.now();
+    final latitude = includeSampleLocation ? 41.0082 : null;
+    final longitude = includeSampleLocation ? 28.9784 : null;
+
+    await FirebaseFirestore.instance
+        .collection('emergency_groups')
+        .doc(settings.pairingCode)
+        .collection('alerts')
+        .add({
+          'patientName': patientName ?? '${settings.displayName} Test',
+          'pairingCode': settings.pairingCode,
+          'hasLocation': includeSampleLocation,
+          'latitude': latitude,
+          'longitude': longitude,
+          'accuracy': includeSampleLocation ? 25.0 : null,
+          'mapsUrl': includeSampleLocation
+              ? 'https://maps.google.com/?q=$latitude,$longitude'
+              : '',
+          'locationError': includeSampleLocation
+              ? ''
+              : 'Debug testinde konum eklenmedi.',
+          'createdAt': FieldValue.serverTimestamp(),
+          'createdAtMillis': now.millisecondsSinceEpoch,
+          'debug': true,
+        });
+  }
+
   static Future<void> startResponderListener() async {
     await _listener?.cancel();
 
@@ -87,7 +131,9 @@ class AppToAppAlertService {
       return;
     }
 
-    final listenFrom = DateTime.now().millisecondsSinceEpoch;
+    final listenFrom = DateTime.now()
+        .subtract(const Duration(minutes: 30))
+        .millisecondsSinceEpoch;
     _listener = FirebaseFirestore.instance
         .collection('emergency_groups')
         .doc(settings.pairingCode)
@@ -99,6 +145,9 @@ class AppToAppAlertService {
           (snapshot) {
             for (final change in snapshot.docChanges) {
               if (change.type != DocumentChangeType.added) {
+                continue;
+              }
+              if (!_seenAlertIds.add(change.doc.id)) {
                 continue;
               }
               final data = change.doc.data();
@@ -157,21 +206,6 @@ class AppToAppAlertService {
       debugPrint('Emergency alert will be sent without location: $error');
       return _EmergencyLocation.withoutPosition(error.toString());
     }
-  }
-
-  static Future<bool> _requestLocationPermission() async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return false;
-    }
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    return permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
   }
 }
 

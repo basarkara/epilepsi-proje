@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -13,6 +12,7 @@ import 'emergency/emergency_app_settings_store.dart';
 import 'emergency/emergency_background_service.dart';
 import 'emergency/emergency_notification_service.dart';
 import 'theme/app_theme.dart';
+import 'screens/auth_gate.dart';
 import 'screens/app_startup_screen.dart';
 import 'screens/emergency_countdown_screen.dart';
 import 'providers/sos_provider.dart';
@@ -34,9 +34,14 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key, this.enableEmergencyProtection = true});
+  const MyApp({
+    super.key,
+    this.enableEmergencyProtection = true,
+    this.enableAuth = true,
+  });
 
   final bool enableEmergencyProtection;
+  final bool enableAuth;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -74,6 +79,9 @@ class _MyAppState extends State<MyApp> {
 
       if (settings.mode == EmergencyAppMode.responder) {
         await AppToAppAlertService.startResponderListener();
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          await initializeEmergencyBackgroundService();
+        }
         return;
       }
 
@@ -122,47 +130,9 @@ class _MyAppState extends State<MyApp> {
       title: 'Epilepsi Takip',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      home: AppStartupScreen(onConfigured: _bootstrapEmergencyProtection),
+      home: widget.enableAuth
+          ? AuthGate(onConfigured: _bootstrapEmergencyProtection)
+          : AppStartupScreen(onConfigured: _bootstrapEmergencyProtection),
     );
   }
 }
-=======
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/date_symbol_data_local.dart'; // 1. BU İMPORT ŞART
-import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
-import 'providers/sos_provider.dart';
-
-// main fonksiyonunu async yaptık
-void main() async {
-  // 2. Flutter motorunun hazır olduğundan emin oluyoruz
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // 3. Türkçe dil verilerini yüklüyoruz (O kırmızı hatayı çözen satır)
-  await initializeDateFormatting('tr_TR', null);
-
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => SOSProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Epilepsi Takip',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme, 
-      home: const HomeScreen(),
-    );
-  }
-}
->>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01

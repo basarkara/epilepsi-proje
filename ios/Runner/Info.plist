@@ -24,7 +24,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-<<<<<<< HEAD
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -34,11 +33,6 @@
 	<key>NSMotionUsageDescription</key>
 	<string>Motion data is used to detect possible falls or violent shaking.</string>
 	<key>UIApplicationSceneManifest</key>
-=======
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UIApplicationSceneManifest</key>
->>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
@@ -59,7 +53,6 @@
 			</array>
 		</dict>
 	</dict>
-<<<<<<< HEAD
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -68,11 +61,6 @@
 		<string>location</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-=======
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
->>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>

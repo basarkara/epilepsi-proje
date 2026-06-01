@@ -7,6 +7,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 
 import 'app_to_app_alert_service.dart';
 import 'emergency_alert_store.dart';
+import 'emergency_app_settings_store.dart';
 import 'emergency_config.dart';
 import 'emergency_notification_service.dart';
 import 'motion_emergency_detector.dart';
@@ -16,6 +17,11 @@ Future<void> initializeEmergencyBackgroundService() async {
       defaultTargetPlatform != TargetPlatform.iOS) {
     return;
   }
+
+  final settings = await EmergencyAppSettingsStore.load();
+  final foregroundTypes = settings.mode == EmergencyAppMode.responder
+      ? const [AndroidForegroundType.dataSync]
+      : const [AndroidForegroundType.health, AndroidForegroundType.location];
 
   await EmergencyNotificationService.initialize();
 
@@ -27,14 +33,11 @@ Future<void> initializeEmergencyBackgroundService() async {
       autoStartOnBoot: true,
       isForegroundMode: true,
       notificationChannelId: EmergencyNotificationService.foregroundChannelId,
-      initialNotificationTitle: 'Epilepsy protection active',
-      initialNotificationContent: 'Monitoring motion for emergency events.',
+      initialNotificationTitle: 'Epilepsi koruması aktif',
+      initialNotificationContent: 'Acil durum sistemi çalışıyor.',
       foregroundServiceNotificationId:
           EmergencyNotificationService.foregroundNotificationId,
-      foregroundServiceTypes: const [
-        AndroidForegroundType.health,
-        AndroidForegroundType.location,
-      ],
+      foregroundServiceTypes: foregroundTypes,
     ),
     iosConfiguration: IosConfiguration(
       autoStart: false,
@@ -42,6 +45,21 @@ Future<void> initializeEmergencyBackgroundService() async {
       onBackground: emergencyIosBackgroundFetch,
     ),
   );
+}
+
+Future<void> restartEmergencyBackgroundService() async {
+  if (defaultTargetPlatform != TargetPlatform.android &&
+      defaultTargetPlatform != TargetPlatform.iOS) {
+    return;
+  }
+
+  final service = FlutterBackgroundService();
+  if (await service.isRunning()) {
+    service.invoke('stopService');
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+  }
+
+  await initializeEmergencyBackgroundService();
 }
 
 @pragma('vm:entry-point')
@@ -58,6 +76,12 @@ void emergencyBackgroundServiceStart(ServiceInstance service) async {
 
   await EmergencyNotificationService.initialize();
 
+  final settings = await EmergencyAppSettingsStore.load();
+
+  if (service is AndroidServiceInstance) {
+    await service.setAsForegroundService();
+  }
+
   MotionEmergencyDetector? detector;
 
   service.on('cancelEmergency').listen((event) async {
@@ -70,8 +94,21 @@ void emergencyBackgroundServiceStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) async {
     await detector?.stop();
+    await AppToAppAlertService.stopResponderListener();
     service.stopSelf();
   });
+
+  if (settings.mode == EmergencyAppMode.responder) {
+    if (service is AndroidServiceInstance) {
+      service.setForegroundNotificationInfo(
+        title: 'Acil uyarılar dinleniyor',
+        content: 'Eşleşme kodu: ${settings.pairingCode}',
+      );
+    }
+
+    await AppToAppAlertService.startResponderListener();
+    return;
+  }
 
   detector = MotionEmergencyDetector(
     onTrigger: (trigger) async {
@@ -91,8 +128,8 @@ void emergencyBackgroundServiceStart(ServiceInstance service) async {
 
   if (service is AndroidServiceInstance) {
     service.setForegroundNotificationInfo(
-      title: 'Epilepsy protection active',
-      content: 'Monitoring fall and violent shaking signals.',
+      title: 'Epilepsi koruması aktif',
+      content: 'Düşme ve şiddetli sarsıntı sinyalleri izleniyor.',
     );
   }
 }

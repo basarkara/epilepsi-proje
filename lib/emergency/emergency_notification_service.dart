@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'emergency_alert_store.dart';
 
@@ -19,15 +21,24 @@ class EmergencyNotificationService {
 
   static const String emergencyChannelId = 'epilepsy_emergency_alerts';
   static const String foregroundChannelId = 'epilepsy_motion_monitor';
+  static const String medicationChannelId = 'epilepsy_medication_reminders';
   static const int emergencyNotificationId = 7001;
   static const int foregroundNotificationId = 7002;
 
+  static bool _initialized = false;
+  static bool _timeZoneInitialized = false;
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize({
     void Function(NotificationResponse response)? onNotificationResponse,
   }) async {
+    _ensureTimeZoneInitialized();
+
+    if (_initialized) {
+      return;
+    }
+
     const androidSettings = AndroidInitializationSettings(
       'ic_bg_service_small',
     );
@@ -79,15 +90,45 @@ class EmergencyNotificationService {
         enableVibration: true,
       ),
     );
+
+    await android?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        medicationChannelId,
+        'İlaç hatırlatmaları',
+        description: 'İlaç saatlerinde hatırlatma bildirimi gösterir.',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+
+    _initialized = true;
+  }
+
+  static void _ensureTimeZoneInitialized() {
+    if (_timeZoneInitialized) {
+      return;
+    }
+
+    tz_data.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
+    _timeZoneInitialized = true;
   }
 
   static Future<void> requestPermission() async {
+    await initialize();
+
     if (defaultTargetPlatform == TargetPlatform.android) {
       await _plugin
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >()
           ?.requestNotificationsPermission();
+      await _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.requestExactAlarmsPermission();
     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
       await _plugin
@@ -107,10 +148,12 @@ class EmergencyNotificationService {
     required String incidentId,
     required int secondsLeft,
   }) async {
+    await initialize();
+
     await _plugin.show(
       emergencyNotificationId,
-      'Possible seizure detected',
-      'Emergency notification will be sent in $secondsLeft seconds.',
+      'Olası kriz algılandı',
+      'Acil bildirim $secondsLeft saniye içinde gönderilecek.',
       const NotificationDetails(
         android: AndroidNotificationDetails(
           emergencyChannelId,
@@ -126,22 +169,28 @@ class EmergencyNotificationService {
           actions: <AndroidNotificationAction>[
             AndroidNotificationAction(
               cancelEmergencyActionId,
-              'Cancel',
+              'İptal et',
               cancelNotification: true,
             ),
           ],
         ),
         iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+        ),
       ),
       payload: incidentId,
     );
   }
 
   static Future<void> showAlertSentNotification() async {
+    await initialize();
+
     await _plugin.show(
       emergencyNotificationId,
-      'Emergency alert sent',
-      'Your responders were notified.',
+      'Acil bildirim gönderildi',
+      'Acil durum kişilerine haber verildi.',
       const NotificationDetails(
         android: AndroidNotificationDetails(
           emergencyChannelId,
@@ -151,6 +200,10 @@ class EmergencyNotificationService {
           icon: 'ic_bg_service_small',
         ),
         iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+        ),
       ),
     );
   }
@@ -159,12 +212,14 @@ class EmergencyNotificationService {
     required String patientName,
     required String mapsUrl,
   }) async {
+    await initialize();
+
     await _plugin.show(
       DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      'Emergency alert: $patientName',
+      'Acil durum: $patientName',
       mapsUrl.isEmpty
-          ? 'Location could not be shared. Open the app to view details.'
-          : 'Location: $mapsUrl',
+          ? 'Konum paylaşılamadı. Detayları görmek için uygulamayı aç.'
+          : 'Konum hazır. Detayları görmek için uygulamayı aç.',
       const NotificationDetails(
         android: AndroidNotificationDetails(
           emergencyChannelId,
@@ -176,6 +231,10 @@ class EmergencyNotificationService {
           icon: 'ic_bg_service_small',
         ),
         iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+        ),
       ),
       payload: mapsUrl,
     );
@@ -184,4 +243,62 @@ class EmergencyNotificationService {
   static Future<void> cancelEmergencyNotification() async {
     await _plugin.cancel(emergencyNotificationId);
   }
+
+  static Future<void> scheduleDailyMedicationReminder({
+    required int id,
+    required String medicationName,
+    required String dosage,
+    required TimeOfDayParts time,
+  }) async {
+    _ensureTimeZoneInitialized();
+    await requestPermission();
+
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+
+    if (!scheduledDate.isAfter(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    await _plugin.zonedSchedule(
+      id,
+      'İlaç zamanı',
+      '$medicationName${dosage.isEmpty ? '' : ' - $dosage'} alma zamanı.',
+      scheduledDate,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          medicationChannelId,
+          'İlaç hatırlatmaları',
+          channelDescription: 'İlaç saatlerinde hatırlatma bildirimi gösterir.',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: 'ic_bg_service_small',
+        ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.wallClockTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+      payload: 'medication:$id',
+    );
+  }
+}
+
+class TimeOfDayParts {
+  const TimeOfDayParts({required this.hour, required this.minute});
+
+  final int hour;
+  final int minute;
 }
