@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
+<<<<<<< HEAD
   static const Color background = Color(0xFF101820);
   static const Color surface = Color(0xFF17212B);
   static const Color card = Color(0xFF202B36);
@@ -14,12 +15,20 @@ class AppColors {
   static const Color grey = Color(0xFFAEB7C2);
   static const Color muted = Color(0xFF6E7A88);
   static const Color border = Color(0xFF2D3A47);
+=======
+  static const Color background = Color(0xFF1A1F26); // dark navy/black
+  static const Color primary = Color(0xFFFFD700); // gold
+  static const Color card = Color(0xFF252A34); // slightly lighter card
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color grey = Color(0xFFA0A0A0);
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
 }
 
 class AppTheme {
   AppTheme._();
 
   static ThemeData get theme {
+<<<<<<< HEAD
     final colorScheme = const ColorScheme.dark().copyWith(
       surface: AppColors.background,
       primary: AppColors.primary,
@@ -27,6 +36,15 @@ class AppTheme {
       secondary: AppColors.secondary,
       onSurface: AppColors.white,
       error: AppColors.emergency,
+=======
+    final colorScheme = ColorScheme.dark().copyWith(
+      // Use `surface` as the app's main background tone per update
+      surface: AppColors.background,
+      primary: AppColors.primary,
+      onPrimary: Colors.black,
+      secondary: AppColors.card,
+      onSurface: AppColors.white,
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
     );
 
     final base = ThemeData.dark();
@@ -43,7 +61,11 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surface,
         elevation: 0,
+<<<<<<< HEAD
         centerTitle: false,
+=======
+        centerTitle: true,
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
         iconTheme: const IconThemeData(color: AppColors.white),
         titleTextStyle: const TextStyle(
           color: AppColors.white,
@@ -56,12 +78,20 @@ class AppTheme {
         displayLarge: TextStyle(
           color: AppColors.white,
           fontWeight: FontWeight.bold,
+<<<<<<< HEAD
           fontSize: 30,
+=======
+          fontSize: 28,
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
         ),
         displayMedium: TextStyle(
           color: AppColors.white,
           fontWeight: FontWeight.w700,
+<<<<<<< HEAD
           fontSize: 24,
+=======
+          fontSize: 22,
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
         ),
         titleLarge: TextStyle(
           color: AppColors.white,
@@ -89,6 +119,7 @@ class AppTheme {
         color: AppColors.card,
         elevation: 0,
         shape: RoundedRectangleBorder(
+<<<<<<< HEAD
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
       ),
@@ -114,15 +145,24 @@ class AppTheme {
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: AppColors.emergency),
+=======
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
         ),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
+<<<<<<< HEAD
           foregroundColor: AppColors.background,
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+=======
+          foregroundColor: Colors.black,
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
           elevation: 0,
           textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
@@ -138,6 +178,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.white,
+<<<<<<< HEAD
           side: const BorderSide(color: AppColors.border),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -172,6 +213,13 @@ class AppTheme {
         contentTextStyle: TextStyle(color: AppColors.white),
       ),
 
+=======
+          side: const BorderSide(color: AppColors.grey),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colorScheme.surface,
         selectedItemColor: AppColors.primary,
@@ -186,6 +234,7 @@ class AppTheme {
       ),
 
       // Reduce motion where possible
+<<<<<<< HEAD
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
@@ -193,6 +242,13 @@ class AppTheme {
           TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
         },
       ),
+=======
+      pageTransitionsTheme: const PageTransitionsTheme(builders: {
+        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+      }),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
     );
   }
 }

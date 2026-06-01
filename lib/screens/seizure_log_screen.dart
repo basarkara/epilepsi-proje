@@ -57,12 +57,16 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. KISIM: GİRİŞ FORMU
+<<<<<<< HEAD
             Text(
               "Yeni Nöbet Girişi",
               style: textTheme.titleLarge?.copyWith(
                 color: const Color(0xFFFFD700),
               ),
             ),
+=======
+            Text("Yeni Nöbet Girişi", style: textTheme.titleLarge?.copyWith(color: const Color(0xFFFFD700))),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(12),
@@ -78,6 +82,7 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                     isExpanded: true,
                     dropdownColor: AppColors.card,
                     style: const TextStyle(color: Colors.white),
+<<<<<<< HEAD
                     items: ['Tonik-Klonik', 'Absans', 'Fokal']
                         .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                         .toList(),
@@ -99,12 +104,26 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                       activeColor: const Color(0xFF80CBC4),
                     ),
                   ),
+=======
+                    items: ['Tonik-Klonik', 'Absans', 'Fokal'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                    onChanged: (v) => setState(() => selectedSeizureType = v),
+                  ),
+                  ...triggers.keys.map((key) => CheckboxListTile(
+                        title: Text(key, style: const TextStyle(fontSize: 14, color: Colors.white)),
+                        value: triggers[key],
+                        onChanged: (v) => setState(() => triggers[key] = v!),
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: const Color(0xFF80CBC4),
+                      )),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: _saveLog,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF80CBC4),
                       minimumSize: const Size(double.infinity, 50),
+<<<<<<< HEAD
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -116,6 +135,11 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+=======
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text("KAYDET VE LİSTELE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
                   ),
                 ],
               ),
@@ -124,21 +148,29 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
             const SizedBox(height: 30),
 
             // 2. KISIM: LİSTE BAŞLIĞI
+<<<<<<< HEAD
             Text(
               "Geçmiş Nöbetler (${savedLogs.length})",
               style: textTheme.titleLarge,
             ),
+=======
+            Text("Geçmiş Nöbetler (${savedLogs.length})", style: textTheme.titleLarge),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
             const SizedBox(height: 10),
 
             // 3. KISIM: DİNAMİK LİSTE (Kaydı burada göreceksin)
             Expanded(
               child: savedLogs.isEmpty
+<<<<<<< HEAD
                   ? const Center(
                       child: Text(
                         "Henüz bir nöbet kaydetmediniz.",
                         style: TextStyle(color: Colors.grey),
                       ),
                     )
+=======
+                  ? const Center(child: Text("Henüz bir nöbet kaydetmediniz.", style: TextStyle(color: Colors.grey)))
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
                   : ListView.builder(
                       itemCount: savedLogs.length,
                       itemBuilder: (context, index) {
@@ -146,6 +178,7 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                         return Card(
                           color: AppColors.card,
                           margin: const EdgeInsets.only(bottom: 12),
+<<<<<<< HEAD
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -169,12 +202,24 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                                 'dd MMM yyyy - HH:mm',
                                 'tr_TR',
                               ).format(log['date']),
+=======
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          child: ListTile(
+                            leading: const CircleAvatar(
+                              backgroundColor: Color(0xFF80CBC4),
+                              child: Icon(Icons.access_time, color: Colors.black),
+                            ),
+                            title: Text(log['type'], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                            subtitle: Text(
+                              DateFormat('dd MMM yyyy - HH:mm', 'tr_TR').format(log['date']),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
                               style: const TextStyle(color: Colors.grey),
                             ),
                             trailing: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
+<<<<<<< HEAD
                                 const Text(
                                   "Tetikleyici",
                                   style: TextStyle(
@@ -189,6 +234,10 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                                     color: Colors.orangeAccent,
                                   ),
                                 ),
+=======
+                                const Text("Tetikleyici", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                Text(log['triggers'], style: const TextStyle(fontSize: 11, color: Colors.orangeAccent)),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
                               ],
                             ),
                           ),
@@ -201,4 +250,8 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01

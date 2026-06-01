@@ -45,6 +45,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+<<<<<<< HEAD
             Center(
               child: Container(
                 width: 50,
@@ -76,6 +77,17 @@ class _MedicationScreenState extends State<MedicationScreen> {
               "Zaman (örn: 08:00 AM)",
               Icons.access_time,
             ),
+=======
+          Center(
+              child: Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20),
+            const Text("Yeni İlaç Bilgileri", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            _buildTextField(_nameController, "İlaç Adı", Icons.medication),
+            _buildTextField(_dosageController, "Dozaj (örn: 100mg)", Icons.shutter_speed),
+            _buildTextField(_timeController, "Zaman (örn: 08:00 AM)", Icons.access_time),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -97,6 +109,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF80CBC4),
                 minimumSize: const Size(double.infinity, 55),
+<<<<<<< HEAD
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -108,6 +121,11 @@ class _MedicationScreenState extends State<MedicationScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+=======
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              child: const Text("KAYDET", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
             ),
           ],
         ),
@@ -115,11 +133,15 @@ class _MedicationScreenState extends State<MedicationScreen> {
     );
   }
 
+<<<<<<< HEAD
   Widget _buildTextField(
     TextEditingController controller,
     String label,
     IconData icon,
   ) {
+=======
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon) {
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: TextField(
@@ -129,6 +151,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
           labelText: label,
           labelStyle: const TextStyle(color: Colors.grey),
           prefixIcon: Icon(icon, color: const Color(0xFF80CBC4)),
+<<<<<<< HEAD
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Colors.white10),
@@ -137,6 +160,10 @@ class _MedicationScreenState extends State<MedicationScreen> {
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Color(0xFF80CBC4)),
           ),
+=======
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.white10)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF80CBC4))),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
           filled: true,
           fillColor: Colors.black26,
         ),
@@ -156,6 +183,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
         child: Column(
           children: [
             Expanded(
+<<<<<<< HEAD
               child: medications.isEmpty
                   ? const Center(
                       child: Text(
@@ -168,6 +196,14 @@ class _MedicationScreenState extends State<MedicationScreen> {
                       itemBuilder: (context, index) =>
                           _buildMedCard(medications[index], index),
                     ),
+=======
+              child: medications.isEmpty 
+                ? const Center(child: Text("Henüz ilaç eklemediniz.", style: TextStyle(color: Colors.grey)))
+                : ListView.builder(
+                    itemCount: medications.length,
+                    itemBuilder: (context, index) => _buildMedCard(medications[index], index),
+                  ),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -175,6 +211,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF80CBC4),
                 minimumSize: const Size(double.infinity, 55),
+<<<<<<< HEAD
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -187,6 +224,11 @@ class _MedicationScreenState extends State<MedicationScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+=======
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              ),
+              child: const Text("Yeni İlaç Ekle +", style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
             ),
             const SizedBox(height: 15),
             _buildSummaryBar(takenCount),
@@ -200,6 +242,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
     double progress = medications.isEmpty ? 0 : takenCount / medications.length;
     return Container(
       padding: const EdgeInsets.all(18),
+<<<<<<< HEAD
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(20),
@@ -222,12 +265,23 @@ class _MedicationScreenState extends State<MedicationScreen> {
               backgroundColor: Colors.white10,
               color: const Color(0xFF80CBC4),
             ),
+=======
+      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(20)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Bugün Alınan: $takenCount/${medications.length}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          SizedBox(
+            width: 40, height: 40,
+            child: CircularProgressIndicator(value: progress, backgroundColor: Colors.white10, color: const Color(0xFF80CBC4)),
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
           ),
         ],
       ),
     );
   }
 
+<<<<<<< HEAD
   Widget _buildMedCard(Map<String, dynamic> med, int index) {
     // Duruma göre ikon ve renk belirliyoruz
     final bool isTaken = med['isTaken'] ?? false;
@@ -237,6 +291,13 @@ class _MedicationScreenState extends State<MedicationScreen> {
     final IconData statusIcon = isTaken
         ? Icons.medication_liquid
         : Icons.access_time;
+=======
+Widget _buildMedCard(Map<String, dynamic> med, int index) {
+    // Duruma göre ikon ve renk belirliyoruz
+    final bool isTaken = med['isTaken'] ?? false;
+    final Color statusColor = isTaken ? const Color(0xFF80CBC4) : const Color(0xFF4A90E2);
+    final IconData statusIcon = isTaken ? Icons.medication_liquid : Icons.access_time;
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -252,6 +313,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+<<<<<<< HEAD
                 const Text(
                   "İlaç Adı",
                   style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -277,6 +339,17 @@ class _MedicationScreenState extends State<MedicationScreen> {
             ),
           ),
 
+=======
+                const Text("İlaç Adı", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text(med['name'], style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                const Text("Dozaj • Zaman", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text("${med['dosage']} • ${med['time']}", style: const TextStyle(color: Colors.white, fontSize: 16)),
+              ],
+            ),
+          ),
+          
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
           // Sağ Taraf: Alındı/Bekleniyor Butonu ve Yazısı
           GestureDetector(
             onTap: () {
@@ -292,9 +365,15 @@ class _MedicationScreenState extends State<MedicationScreen> {
                 Text(
                   isTaken ? "Alındı" : "Bekleniyor",
                   style: TextStyle(
+<<<<<<< HEAD
                     color: statusColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
+=======
+                    color: statusColor, 
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 12
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
                   ),
                 ),
               ],
@@ -304,4 +383,8 @@ class _MedicationScreenState extends State<MedicationScreen> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> de408701751cae7e5e23c4f3f5bba691d3828f01
