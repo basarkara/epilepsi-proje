@@ -22,6 +22,7 @@ class EmergencyNotificationService {
   static const String emergencyChannelId = 'epilepsy_emergency_alerts';
   static const String foregroundChannelId = 'epilepsy_motion_monitor';
   static const String medicationChannelId = 'epilepsy_medication_reminders';
+  static const String appointmentChannelId = 'epilepsy_appointment_reminders';
   static const int emergencyNotificationId = 7001;
   static const int foregroundNotificationId = 7002;
 
@@ -96,6 +97,17 @@ class EmergencyNotificationService {
         medicationChannelId,
         'İlaç hatırlatmaları',
         description: 'İlaç saatlerinde hatırlatma bildirimi gösterir.',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+
+    await android?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        appointmentChannelId,
+        'Doktor randevuları',
+        description: 'Doktor randevuları için hatırlatma bildirimi gösterir.',
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
@@ -293,6 +305,57 @@ class EmergencyNotificationService {
       matchDateTimeComponents: DateTimeComponents.time,
       payload: 'medication:$id',
     );
+  }
+
+  static Future<void> scheduleAppointmentReminder({
+    required int id,
+    required String doctorName,
+    required String clinicName,
+    required DateTime appointmentDateTime,
+  }) async {
+    _ensureTimeZoneInitialized();
+    await requestPermission();
+
+    final now = tz.TZDateTime.now(tz.local);
+    final appointment = tz.TZDateTime.from(appointmentDateTime, tz.local);
+    var reminderTime = appointment.subtract(const Duration(hours: 1));
+    if (!reminderTime.isAfter(now)) {
+      reminderTime = appointment;
+    }
+    if (!reminderTime.isAfter(now)) {
+      return;
+    }
+
+    await _plugin.zonedSchedule(
+      id,
+      'Doktor randevusu',
+      '$doctorName${clinicName.isEmpty ? '' : ' - $clinicName'} randevusu yaklaşıyor.',
+      reminderTime,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          appointmentChannelId,
+          'Doktor randevuları',
+          channelDescription:
+              'Doktor randevuları için hatırlatma bildirimi gösterir.',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: 'ic_bg_service_small',
+        ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.wallClockTime,
+      payload: 'appointment:$id',
+    );
+  }
+
+  static Future<void> cancelNotification(int id) async {
+    await _plugin.cancel(id);
   }
 }
 

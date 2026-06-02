@@ -5,9 +5,14 @@ import '../theme/app_theme.dart';
 import 'home_screen.dart';
 
 class AppStartupScreen extends StatefulWidget {
-  const AppStartupScreen({super.key, required this.onConfigured});
+  const AppStartupScreen({
+    super.key,
+    required this.onConfigured,
+    this.onSignedOut,
+  });
 
   final Future<void> Function() onConfigured;
+  final Future<void> Function()? onSignedOut;
 
   @override
   State<AppStartupScreen> createState() => _AppStartupScreenState();
@@ -83,7 +88,10 @@ class _AppStartupScreenState extends State<AppStartupScreen> {
     }
 
     if (_settings?.isReady ?? false) {
-      return HomeScreen(onSettingsChanged: _loadSettings);
+      return HomeScreen(
+        onSettingsChanged: _loadSettings,
+        onSignedOut: widget.onSignedOut,
+      );
     }
 
     final textTheme = Theme.of(context).textTheme;

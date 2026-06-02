@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../auth/app_auth_service.dart';
 import '../emergency/emergency_app_settings_store.dart';
 import '../theme/app_theme.dart';
 
@@ -47,10 +48,7 @@ class _AuthScreenState extends State<AuthScreen> {
       final password = _passwordController.text;
 
       if (_isRegisterMode) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        await AppAuthService.register(email: email, password: password);
 
         await EmergencyAppSettingsStore.save(
           EmergencyAppSettings(
@@ -60,10 +58,7 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         );
       } else {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        await AppAuthService.signIn(email: email, password: password);
       }
 
       await widget.onSignedIn();
@@ -71,6 +66,13 @@ class _AuthScreenState extends State<AuthScreen> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(_firebaseAuthMessage(error)),
+          backgroundColor: AppColors.emergency,
+        ),
+      );
+    } on MacAuthException catch (error) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(_macAuthMessage(error)),
           backgroundColor: AppColors.emergency,
         ),
       );
@@ -85,6 +87,27 @@ class _AuthScreenState extends State<AuthScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  String _macAuthMessage(MacAuthException error) {
+    switch (error.code) {
+      case 'EMAIL_EXISTS':
+        return 'Bu e-posta ile daha önce kayıt olunmuş.';
+      case 'INVALID_EMAIL':
+        return 'E-posta adresi geçerli değil.';
+      case 'WEAK_PASSWORD':
+        return 'Şifre daha güçlü olmalı. En az 6 karakter kullan.';
+      case 'EMAIL_NOT_FOUND':
+      case 'INVALID_PASSWORD':
+      case 'INVALID_LOGIN_CREDENTIALS':
+        return 'E-posta veya şifre hatalı.';
+      case 'OPERATION_NOT_ALLOWED':
+        return 'Firebase üzerinde E-posta/Şifre girişi açılmamış.';
+      case 'TOKEN_NOT_RETURNED':
+        return 'Giriş yapıldı ama oturum bilgisi alınamadı.';
+      default:
+        return 'Kimlik doğrulama hatası oluştu: ${error.code}';
     }
   }
 

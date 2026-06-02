@@ -1,15 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../auth/app_auth_service.dart';
 import '../emergency/app_to_app_alert_service.dart';
 import '../emergency/emergency_app_settings_store.dart';
 import '../emergency/emergency_background_service.dart';
 import '../theme/app_theme.dart';
 
 class EmergencySettingsScreen extends StatefulWidget {
-  const EmergencySettingsScreen({super.key, this.onSaved});
+  const EmergencySettingsScreen({super.key, this.onSaved, this.onSignedOut});
 
   final Future<void> Function()? onSaved;
+  final Future<void> Function()? onSignedOut;
 
   @override
   State<EmergencySettingsScreen> createState() =>
@@ -85,12 +86,13 @@ class _EmergencySettingsScreenState extends State<EmergencySettingsScreen> {
 
   Future<void> _signOut() async {
     await AppToAppAlertService.stopResponderListener();
-    await FirebaseAuth.instance.signOut();
+    await AppAuthService.signOut();
+    await widget.onSignedOut?.call();
 
     if (!mounted) {
       return;
     }
-    Navigator.of(context).pop();
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override

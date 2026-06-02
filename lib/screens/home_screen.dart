@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../emergency/emergency_app_settings_store.dart';
 import '../theme/app_theme.dart';
+import 'appointments_screen.dart';
 import 'emergency_settings_screen.dart';
+import 'health_reports_screen.dart';
 import 'manual_sos_confirmation_screen.dart';
 import 'medication_screen.dart';
 import 'seizure_log_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, this.onSettingsChanged});
+  const HomeScreen({super.key, this.onSettingsChanged, this.onSignedOut});
 
   final Future<void> Function()? onSettingsChanged;
+  final Future<void> Function()? onSignedOut;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -46,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
             await _loadSettings();
             await widget.onSettingsChanged?.call();
           },
+          onSignedOut: widget.onSignedOut,
         ),
       ),
     );
@@ -296,6 +300,26 @@ class _QuickActionGrid extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MedicationScreen()),
+        ),
+      ),
+      _QuickAction(
+        icon: Icons.insert_chart_outlined,
+        color: AppColors.success,
+        title: 'Raporlar',
+        subtitle: 'Grafik ve takvim',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HealthReportsScreen()),
+        ),
+      ),
+      _QuickAction(
+        icon: Icons.event_available,
+        color: const Color(0xFFB06CFF),
+        title: 'Randevular',
+        subtitle: 'Doktor takibi',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AppointmentsScreen()),
         ),
       ),
       _QuickAction(
